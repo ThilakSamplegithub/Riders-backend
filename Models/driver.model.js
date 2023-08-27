@@ -6,8 +6,7 @@ const mongoose=require("mongoose")
     phoneNumber:{type:String,required:true},
     carModel:{type:String,required:true},
     carLicensePlate: { type: String, required: true },
-    location:{type:String,required:true},
-    accept:{type:Boolean,default:false}
+    location:{type:String,required:true,lowercase:true}
   },{versionKey:false})
    const driverModel= mongoose.model("Driver",driverSchema)
    module.exports={driverModel}

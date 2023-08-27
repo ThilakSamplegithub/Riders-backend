@@ -62,6 +62,7 @@ passengerRouter.post("/login", async (req, res) => {
     res.status(401).send({ msg: err.message });
   }
 });
+// This end point is to upload image
 passengerRouter.patch(
   "/update/profile/:id",
   authMiddleware,
@@ -112,6 +113,7 @@ passengerRouter.patch("/update/location/:id",authMiddleware,async(req,res)=>{
         res.status(400).send({msg:err.message})
      }
 })
+//passenger makes request 
 passengerRouter.patch("/update/request/:id",authMiddleware,async(req,res)=>{
   try{
       const {id}=req.params
@@ -125,33 +127,17 @@ passengerRouter.patch("/update/request/:id",authMiddleware,async(req,res)=>{
      res.status(400).send({msg:err.message})
   }
 })
-// passenger gets driver to get a ride
-passengerRouter.patch("/update/getDriverId/:id",driverAuthMiddleware,async(req,res)=>{
-try{
-  const{id}=req.params
-const passenger= await passengerModel.find({$and:[{_id:id},{location:req.location}]})
-if(passenger.request&&passenger){
-console.log(passenger)
-const updatedDriverId=await passengerModel.updateOne({_id:id},{$set:{driverId:req.userId}})
-return res.status(200).json({msg:updatedDriverId})
-}else{
-  res.status(200).send({msg:`Passenger doesn't exist or didn't made request`})
-}
-}catch(err){
-  res.status(400).send({msg:err.message})
-}
-})
-// get all those passengers who made request to particular location
-passengerRouter.get("/",async(req,res)=>{
+// get all those passengers who made request to particular location 
+passengerRouter.get("/",driverAuthMiddleware,async(req,res)=>{
  try{
-  console.log(req.query)
-  const {location}=req.query
+  // console.log(req.query)
+  const location=req.location
   console.log(location,"is location")
-  const matchedLocations=new RegExp(location,"i")// To make queries insensitive
-  const user=await passengerModel.findOne({location:matchedLocations})
+  // const matchedLocations=new RegExp(location,"i")// To make queries insensitive
+  const user=await passengerModel.findOne({location})
   console.log(user,"are users")
-  if(user.location){
-    const allPassengers=await passengerModel.find({$and:[{location:matchedLocations},{request:true}]})
+  if(user?.location){
+    const allPassengers=await passengerModel.find({$and:[{location},{request:true}]})
     return res.status(200).json({data:allPassengers})
   }else{
     return res.status(200).json({msg:`No such location exists`})
@@ -160,4 +146,38 @@ passengerRouter.get("/",async(req,res)=>{
   res.status(400).send({msg:err.message})
  }
 })
+// passenger gets confirmation of driver to get a ride
+passengerRouter.patch("/update/getDriverId/:id",driverAuthMiddleware,async(req,res)=>{
+  try{
+    const{id}=req.params
+    console.log(id)
+  const passenger= await passengerModel.find({$and:[{_id:id},{location:req.location}]})
+  console.log(passenger,"is passenger")
+  if(passenger[0].request&&passenger){
+  console.log(passenger)
+  const updatedDriverId=await passengerModel.updateOne({_id:id},{$set:{driverId:req.userId}})
+  console.log(updatedDriverId)
+  return res.status(200).json({msg:"userId of Driver is attached"})
+  }else{
+    res.status(200).send({msg:`Passenger doesn't exist or didn't made request`})
+  }
+  }catch(err){
+    res.status(400).send({msg:err.message})
+  }
+  })
+  // display paricular driver
+  passengerRouter.get("/showDriver",authMiddleware,async(req,res)=>{
+try{
+   const passenger= await passengerModel.findOne({_id:req.userId})
+   console.log(passenger)
+   if(passenger.driverId){
+    const allData= await passengerModel.findOne({_id:String(req.userId)}).populate("driverId")
+   return res.status(200).json({data:allData.driverId})
+   }else{
+    res.status(200).send({msg:`Not yet confirmed`})
+   }
+}catch(err){
+  res.status(200).send({err:err.message})
+}
+  })
 module.exports = { passengerRouter };
