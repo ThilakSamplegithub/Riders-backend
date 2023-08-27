@@ -6,7 +6,7 @@ const mongoose=require("mongoose")
     password:{type:String,min:6,max:12,required:true},
     gender:{type:String,required:true},
     profilePicture:{type:String,required:true},
-    location:{type:String,required:true},
+    location:{type:String,required:true,lowercase:true},
     request:{type:Boolean,default:false},
     driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null }
 },{versionKey:false})

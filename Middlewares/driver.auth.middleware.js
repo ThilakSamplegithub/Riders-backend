@@ -7,7 +7,7 @@ const driverAuthMiddleware=(req,res,next)=>{
         if(err){
             res.status(200).send(`You are not authorized`)
         }else{
-            console.log(decoded)
+            console.log(decoded,"is decoded")
             req.userId=decoded.userId
             req.user=decoded.user
             req.location=decoded.location

@@ -72,19 +72,19 @@ driverRouter.post("/login", async (req, res) => {
   }
 });
 // driver decides whether to accept request or not
-driverRouter.patch("/update/request/:id",driverAuthMiddleware,async(req,res)=>{
-    try{
-        const {id}=req.params
-        const driver=await driverModel.findOne({_id:id})
-      if(driver&&id===req.userId){
-         const updatedRequest=await driverModel.updateOne({_id:id},{$set:{accept:true}})
-         console.log(updatedRequest)
-         return res.status(200).json({msg:"Arriving in 2 min's"})
-      }
-    }catch(err){
-       res.status(400).send({msg:err.message})
-    }
-  })
+// driverRouter.patch("/update/request/:id",driverAuthMiddleware,async(req,res)=>{
+//     try{
+//         const {id}=req.params
+//         const driver=await driverModel.findOne({_id:id})
+//       if(driver&&id===req.userId){
+//          const updatedRequest=await driverModel.updateOne({_id:id},{$set:{accept:true}})
+//          console.log(updatedRequest)
+//          return res.status(200).json({msg:"Arriving in 2 min's"})
+//       }
+//     }catch(err){
+//        res.status(400).send({msg:err.message})
+//     }
+//   })
   //To get particular driver 
   driverRouter.get("/",driverAuthMiddleware,async(req,res)=>{
 try{  
