@@ -1,4 +1,5 @@
 const { Router } = require("express");
+const {passengerBlackListingModel}=require("../Models/blackListing.passengerModel")
 const bcrypt = require("bcrypt");
 const { passengerModel } = require("../Models/passenger.model");
 const { authMiddleware } = require("../Middlewares/auth.middleware");
@@ -179,5 +180,18 @@ try{
 }catch(err){
   res.status(200).send({err:err.message})
 }
+  })
+  // logout
+  passengerRouter.get("/logout",async(req,res)=>{
+    try{
+      const token=req.headers.authorization
+      if(token){
+       const passengerToken_blackListing= await passengerBlackListingModel.create({token})
+       console.log(passengerToken_blackListing)
+       return res.status(200).json({msg:"logged-out successfully",token})
+      }
+    }catch(err){
+      res.status(400).send({msg:err.message})
+    }
   })
 module.exports = { passengerRouter };
