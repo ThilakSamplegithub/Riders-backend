@@ -2,6 +2,7 @@ const { Router } = require("express");
 const driverRouter = Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const {driverBlackListingModel}=require("../Models/blackListing.driverModel")
 const { driverModel } = require("../Models/driver.model");
 const { validatePassword } = require("../validation");
 const {driverAuthMiddleware}=require("../Middlewares/driver.auth.middleware")
@@ -94,5 +95,18 @@ return res.status(200).json({msg:driver})
 }catch(err){
     res.status(400).send({err:err.message})
 }
+  })
+  //logout
+  driverRouter.get("/logout",async(req,res)=>{
+    try{
+      const token=req.headers.authorization
+      if(token){
+       const driverToken_blackListing= await driverBlackListingModel.create({token})
+       console.log(driverToken_blackListing)
+       return res.status(200).json({msg:"logged-out successfully",token})
+      }
+    }catch(err){
+      res.status(400).send({msg:err.message})
+    }
   })
 module.exports = { driverRouter };
