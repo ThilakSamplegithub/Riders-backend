@@ -5,21 +5,8 @@ const { authMiddleware } = require("../Middlewares/auth.middleware");
 const jwt = require("jsonwebtoken");
 const upload = require("../Middlewares/multer.middleware");
 const passengerRouter = Router();
-function validatePassword(password) {
-  if (!/[A-Z]/.test(password)) {
-    return false;
-  } else if (!/[a-z]/.test(password)) {
-    return false;
-  } else if (!/[0-9]/.test(password)) {
-    return false;
-  } else if (!/[!@#$%^&*()_+\-]/.test(password)) {
-    // we can include = but after backslash only otherwise 
-    // it will include range like - will also include range.
-    // So \ is used to escape characters and turn them into regular character.
-    return false;
-  }
-  return true;
-}
+const {validatePassword}=require("../validation");
+const { driverAuthMiddleware } = require("../Middlewares/driver.auth.middleware");
 passengerRouter.post("/register", async (req, res) => {
   try {
     const { name, email, password, gender, phoneNumber, profilePicture,location } =
@@ -125,5 +112,52 @@ passengerRouter.patch("/update/location/:id",authMiddleware,async(req,res)=>{
         res.status(400).send({msg:err.message})
      }
 })
-
+passengerRouter.patch("/update/request/:id",authMiddleware,async(req,res)=>{
+  try{
+      const {id}=req.params
+      const passenger=await passengerModel.findOne({_id:id})
+    if(passenger&&id===req.userId){
+       const updatedRequest=await passengerModel.updateOne({_id:id},{$set:{request:true}})
+       console.log(updatedRequest)
+       return res.status(200).json({msg:"Request sent"})
+    }
+  }catch(err){
+     res.status(400).send({msg:err.message})
+  }
+})
+// passenger gets driver to get a ride
+passengerRouter.patch("/update/getDriverId/:id",driverAuthMiddleware,async(req,res)=>{
+try{
+  const{id}=req.params
+const passenger= await passengerModel.find({$and:[{_id:id},{location:req.location}]})
+if(passenger.request&&passenger){
+console.log(passenger)
+const updatedDriverId=await passengerModel.updateOne({_id:id},{$set:{driverId:req.userId}})
+return res.status(200).json({msg:updatedDriverId})
+}else{
+  res.status(200).send({msg:`Passenger doesn't exist or didn't made request`})
+}
+}catch(err){
+  res.status(400).send({msg:err.message})
+}
+})
+// get all those passengers who made request to particular location
+passengerRouter.get("/",async(req,res)=>{
+ try{
+  console.log(req.query)
+  const {location}=req.query
+  console.log(location,"is location")
+  const matchedLocations=new RegExp(location,"i")// To make queries insensitive
+  const user=await passengerModel.findOne({location:matchedLocations})
+  console.log(user,"are users")
+  if(user.location){
+    const allPassengers=await passengerModel.find({$and:[{location:matchedLocations},{request:true}]})
+    return res.status(200).json({data:allPassengers})
+  }else{
+    return res.status(200).json({msg:`No such location exists`})
+  }
+ }catch(err){
+  res.status(400).send({msg:err.message})
+ }
+})
 module.exports = { passengerRouter };
