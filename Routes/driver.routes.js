@@ -4,8 +4,9 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const {driverBlackListingModel}=require("../Models/blackListing.driverModel")
 const { driverModel } = require("../Models/driver.model");
-const { validatePassword } = require("../validation");
-const {driverAuthMiddleware}=require("../Middlewares/driver.auth.middleware")
+// const { validatePassword } = require("../validation");
+const {driverAuthMiddleware}=require("../Middlewares/driver.auth.middleware");
+const { passengerModel } = require("../Models/passenger.model");
 driverRouter.post("/register", async (req, res) => {
   try {
     const {
@@ -17,9 +18,9 @@ driverRouter.post("/register", async (req, res) => {
       carModel,
       location,
     } = req.body;
-    if (!validatePassword(password)) {
-      return res.status(200).send({ msg: "Not strong password" });
-    }
+    // if (!validatePassword(password)) {
+    //   return res.status(200).send({ msg: "Not strong password" });
+    // }
     bcrypt.hash(password, 5, async (err, hashed) => {
       try {
         if (err) {
@@ -33,7 +34,7 @@ driverRouter.post("/register", async (req, res) => {
             phoneNumber,
             carLicensePlate,
             carModel,
-            location,
+            location
           });
           console.log(driver);
           return res.status(200).json({ msg: driver });
@@ -72,29 +73,17 @@ driverRouter.post("/login", async (req, res) => {
     res.status(400).send({ msg: err.message });
   }
 });
-// driver decides whether to accept request or not
-// driverRouter.patch("/update/request/:id",driverAuthMiddleware,async(req,res)=>{
-//     try{
-//         const {id}=req.params
-//         const driver=await driverModel.findOne({_id:id})
-//       if(driver&&id===req.userId){
-//          const updatedRequest=await driverModel.updateOne({_id:id},{$set:{accept:true}})
-//          console.log(updatedRequest)
-//          return res.status(200).json({msg:"Arriving in 2 min's"})
-//       }
-//     }catch(err){
-//        res.status(400).send({msg:err.message})
-//     }
-//   })
-  //To get particular driver 
-  driverRouter.get("/",driverAuthMiddleware,async(req,res)=>{
-try{  
-const driver=await driverModel.findOne({_id:req.userId})
-console.log(driver)
-return res.status(200).json({msg:driver})
-}catch(err){
-    res.status(400).send({err:err.message})
-}
+
+  // for accepting passenger request
+  driverRouter.post('/accept-request/:passengerId',driverAuthMiddleware,async(req,res)=>{
+    try{
+      const{passengerId}=req.params
+   console.log(passengerId,req.userId)
+    const passenger=await passengerModel.updateOne({_id:passengerId},{$set:{driverId:req.userId}})
+    return res.status(201).json({passenger,msg:'request accepted and driverId is present'})
+    }catch(err){
+      res.status(402).send({err:err.message})
+    }
   })
   //logout
   driverRouter.get("/logout",async(req,res)=>{
@@ -109,4 +98,5 @@ return res.status(200).json({msg:driver})
       res.status(400).send({msg:err.message})
     }
   })
+  
 module.exports = { driverRouter };
