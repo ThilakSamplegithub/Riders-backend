@@ -133,7 +133,8 @@ passengerRouter.get("/:id",authMiddleware,async(req,res)=>{
     console.log(req.userId,'is id of passenger')
     if(id===req.userId){
       const passenger=await passengerModel.findOne({_id:req.userId})
-      return res.status(201).json({passenger})
+      const nearBydrivers=await driverModel.find({location:passenger.location})
+      return res.status(201).json({passenger,nearBydrivers})
     }else{
       return res.status(202).json({msg:"Please login again"})
     }
