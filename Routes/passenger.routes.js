@@ -56,7 +56,7 @@ passengerRouter.post("/login", async (req, res) => {
             { userId: user._id, user: user.name },
             "masai"
           );
-          return res.status(200).json({ msg: `logged-in successfully`, token });
+          return res.status(200).json({ msg: `logged-in successfully`, token,id:user._id });
         }
       });
     }
@@ -104,17 +104,23 @@ passengerRouter.patch(
 );
 
 //passenger makes request 
-passengerRouter.patch("/update/request",authMiddleware,async(req,res)=>{
+passengerRouter.patch("/update/request/:id",authMiddleware,async(req,res)=>{
   try{
       // const {id}=req.params
+      const{id}=req.params
+      console.log(id)
       const{location}=req.body
-      const passenger=await passengerModel.findOne({_id:req.userId})
-    if(passenger){
-       const updatedRequest=await passengerModel.updateOne({_id:req.userId},{$set:{location}})
-       console.log(updatedRequest)
-       const nearBydrivers=await driverModel.find({location})
-       return res.status(200).json({msg:"Request sent",id:req.userId,pickup:location,nearBydrivers})
-    }
+      if(req.userId===id){
+        const passenger=await passengerModel.findOne({_id:id})
+        if(passenger){
+           const updatedRequest=await passengerModel.updateOne({_id:req.userId},{$set:{location}})
+           console.log(updatedRequest)
+           const nearBydrivers=await driverModel.find({location})
+           return res.status(200).json({msg:"Request sent",id:req.userId,pickup:location,nearBydrivers})
+        }
+      }else{
+        return res.status(201).json({msg:`please login again`})
+      }
   }catch(err){
      res.status(400).send({msg:err.message})
   }
