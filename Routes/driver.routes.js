@@ -100,6 +100,16 @@ if(id===req.userId){
       res.status(402).send({err:err.message})
     }
   })
+  // when driver accepts request
+  driverRouter.patch('/confirmed/:id',driverAuthMiddleware,async(req,res)=>{
+      try{
+        const {id}=req.params
+       const passenger= await passengerModel.updateOne({_id:id},{$set:{driverId:req.userId,status:true}})
+       return res.status(200).json({passenger})
+      }catch(err){
+        res.status(400).send({msg:`Something went wrong,Not confirmed`})
+      }
+  })
   //logout
   driverRouter.get("/logout",async(req,res)=>{
     try{

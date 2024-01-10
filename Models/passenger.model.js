@@ -9,6 +9,7 @@ const mongoose=require("mongoose")
     location:{type:String,required:true,lowercase:true},
     request:{type:Boolean,default:false},
     driverId:{type:String,default:null},
+    status:{type:Boolean,default:false}
     // driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
 },{versionKey:false})
   const passengerModel=mongoose.model("Rider",passengerSchema)
