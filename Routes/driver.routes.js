@@ -105,7 +105,7 @@ if(id===req.userId){
       try{
         const {id}=req.params
        const passenger= await passengerModel.updateOne({_id:id},{$set:{driverId:req.userId,status:true}})
-       return res.status(200).json({passenger})
+       return res.status(200).json({passenger,msg:"updated status and driverId successfully"})
       }catch(err){
         res.status(400).send({msg:`Something went wrong,Not confirmed`})
       }
