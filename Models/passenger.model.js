@@ -7,7 +7,7 @@ const mongoose=require("mongoose")
     gender:{type:String,required:true},
     profilePicture:{type:String,required:true,default:"profile.jpg"},
     location:{type:String,required:true,lowercase:true},
-    // request:{type:Boolean,default:false},
+    request:{type:Boolean,default:false},
     driverId:{type:String,default:null},
     // driverId: { type: mongoose.Schema.Types.ObjectId, ref: 'Driver', default: null },
 },{versionKey:false})

@@ -113,7 +113,7 @@ passengerRouter.patch("/update/request/:id",authMiddleware,async(req,res)=>{
       if(req.userId===id){
         const passenger=await passengerModel.findOne({_id:id})
         if(passenger){
-           const updatedRequest=await passengerModel.updateOne({_id:req.userId},{$set:{location}})
+           const updatedRequest=await passengerModel.updateOne({_id:req.userId},{$set:{location,request:true}})
            console.log(updatedRequest)
            const nearBydrivers=await driverModel.find({location})
            return res.status(200).json({msg:"Request sent",id:req.userId,pickup:location,nearBydrivers})
@@ -138,7 +138,6 @@ passengerRouter.get("/:id",authMiddleware,async(req,res)=>{
     }else{
       return res.status(202).json({msg:"Please login again"})
     }
-
   }catch(err){
     res.status(400).send({err:err.message})
   }

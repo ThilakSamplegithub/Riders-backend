@@ -73,7 +73,22 @@ driverRouter.post("/login", async (req, res) => {
     res.status(400).send({ msg: err.message });
   }
 });
-
+driverRouter.get('/locations/:id',driverAuthMiddleware,async(req,res)=>{
+try{
+const {id}=req.params
+console.log(id)
+if(id===req.userId){
+  const driver=await driverModel.findOne({_id:id})
+  const location=driver.location
+  const allPassengers=await passengerModel.find({location})
+  return res.status(201).json({passengers:allPassengers})
+}else{
+  res.status(201).send('please login again')
+}
+}catch(err){
+  res.status(402).send({err:err.message})
+}
+})
   // for accepting passenger request
   driverRouter.post('/accept-request/:passengerId',driverAuthMiddleware,async(req,res)=>{
     try{
