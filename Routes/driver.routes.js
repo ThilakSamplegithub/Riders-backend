@@ -90,18 +90,6 @@ if(id===req.userId){
   res.status(402).send({err:err.message})
 }
 })
-  // for accepting passenger request
-  // driverRouter.post('/accept-request/:passengerId',driverAuthMiddleware,async(req,res)=>{
-  //   try{
-  //     const{passengerId}=req.params
-  //  console.log(passengerId,req.userId)
-  //   const passenger=await passengerModel.updateOne({_id:passengerId},{$set:{driverId:req.userId}})
-  //   return res.status(201).json({passenger,msg:'request accepted and driverId is present'})
-  //   }catch(err){
-  //     res.status(402).send({err:err.message})
-  //   }
-  // })
-  // when driver accepts request
   driverRouter.patch('/confirmed/:id',driverAuthMiddleware,async(req,res)=>{
       try{
         const {id}=req.params

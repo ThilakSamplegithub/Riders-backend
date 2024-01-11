@@ -142,7 +142,21 @@ passengerRouter.get("/:id",authMiddleware,async(req,res)=>{
     res.status(400).send({err:err.message})
   }
 })
-// passengerRouter.get('')
+//After dropping in location again default request and status for next ride.
+passengerRouter.patch('/default/:id',authMiddleware,async(req,res)=>{
+  try{
+     const {id}=req.params
+     if(id===req.userId){
+      const defaultField=await passengerModel.updateOne({_id:id},{$set:{status:false,request:false,driverId:null}})
+      const passenger=await passengerModel.findOne({_id:id})
+      res.status(200).send({msg:`Defaulted all fields`,passenger})
+     }else{
+      res.status(400).send({msg:`Please login again`})
+     }
+  }catch(err){
+    res.status(401).send({err:err.message})
+  }
+})
   // logout
   passengerRouter.get("/logout",async(req,res)=>{
     try{
