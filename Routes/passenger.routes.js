@@ -125,24 +125,24 @@ passengerRouter.patch("/update/request/:id",authMiddleware,async(req,res)=>{
      res.status(400).send({msg:err.message})
   }
 })
-//After driver accepted this will be useful to get drivers id
-// passengerRouter.get("/:id",authMiddleware,async(req,res)=>{
-//   try{
-//     const {id}=req.params
-//     console.log(id)
-//     console.log(req.userId,'is id of passenger')
-//     if(id===req.userId){
-//       const passenger=await passengerModel.findOne({_id:req.userId})
-//       const nearBydrivers=await driverModel.find({location:passenger.location})
-//       return res.status(201).json({passenger,nearBydrivers})
-//     }else{
-//       return res.status(202).json({msg:"Please login again"})
-//     }
-//   }catch(err){
-//     res.status(400).send({err:err.message})
-//   }
-// })
-
+//To get all nearby drivers in my location when I made request
+passengerRouter.get("/:id",authMiddleware,async(req,res)=>{
+  try{
+    const {id}=req.params
+    console.log(id)
+    console.log(req.userId,'is id of passenger')
+    if(id===req.userId){
+      const passenger=await passengerModel.findOne({_id:req.userId})
+      const nearBydrivers=await driverModel.find({location:passenger.location})
+      return res.status(201).json({passenger,nearBydrivers})
+    }else{
+      return res.status(202).json({msg:"Please login again"})
+    }
+  }catch(err){
+    res.status(400).send({err:err.message})
+  }
+})
+// passengerRouter.get('')
   // logout
   passengerRouter.get("/logout",async(req,res)=>{
     try{
