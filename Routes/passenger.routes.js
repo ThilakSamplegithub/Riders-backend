@@ -147,9 +147,11 @@ passengerRouter.patch('/default/:id',authMiddleware,async(req,res)=>{
   try{
      const {id}=req.params
      const {status,request,driverId}=req.body
+     console.log(req.body)
      if(id===req.userId){
       const defaultField=await passengerModel.updateOne({_id:id},{$set:req.body})
       const passenger=await passengerModel.findOne({_id:id})
+      console.log(passenger)
       res.status(200).send({msg:`Defaulted all fields`,passenger})
      }else{
       res.status(400).send({msg:`Please login again`})
