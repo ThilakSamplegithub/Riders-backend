@@ -44,7 +44,7 @@ driverRouter.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     const driver = await driverModel.findOne({ email });
-    if (driver) {
+    if (driver?.email) {
       console.log(driver);
       bcrypt.compare(password, driver.password, (err, result) => {
         if (err) {
