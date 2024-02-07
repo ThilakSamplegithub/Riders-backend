@@ -46,7 +46,7 @@ passengerRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
     const user = await passengerModel.findOne({ email });
     console.log(user);
-    if (email) {
+    if (user?.email) {
       bcrypt.compare(password, user.password, (err, result) => {
         if (err) {
           res.status(200).send({ msg: "Wrong Password" });
@@ -59,6 +59,8 @@ passengerRouter.post("/login", async (req, res) => {
           return res.status(200).json({ msg: `logged-in successfully`, token,id:user._id });
         }
       });
+    }else{
+      res.status(200).send({msg:`Email doesn't exist`})
     }
   } catch (err) {
     res.status(401).send({ msg: err.message });
