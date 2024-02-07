@@ -7,6 +7,10 @@ const { driverModel } = require("../Models/driver.model");
 // const { validatePassword } = require("../validation");
 const {driverAuthMiddleware}=require("../Middlewares/driver.auth.middleware");
 const { passengerModel } = require("../Models/passenger.model");
+const hashPassword = async (password) => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
 driverRouter.post("/register", async (req, res) => {
   try {
     const {
@@ -18,31 +22,20 @@ driverRouter.post("/register", async (req, res) => {
       carModel,
       location,
     } = req.body;
+    console.log(req.body)
     // if (!validatePassword(password)) {
     //   return res.status(200).send({ msg: "Not strong password" });
     // }
-    bcrypt.hash(password, 5, async (err, hashed) => {
-      try {
-        if (err) {
-          res.status(400).send({ err });
-        } else {
-          console.log(hashed);
-          const driver = await driverModel.create({
-            name,
-            email,
-            password: hashed,
-            phoneNumber,
-            carLicensePlate,
-            carModel,
-            location
-          });
-          console.log(driver);
-          return res.status(200).json({ msg: driver });
-        }
-      } catch (err) {
-        res.send({ err: err.message });
-      }
-    });
+    const userHashedPasswords=await Promise.all(req.body.map(async(user)=>{
+try{
+  const hashedPassword=await hashPassword(user.password)
+  return {...user,password:hashedPassword}
+}catch(err){
+  res.status(400).json({err:err.message})
+}
+    }))
+    const allDrivers=await driverModel.insertMany(userHashedPasswords)
+    return res.status(200).json({msg:allDrivers})
   } catch (err) {
     res.status(400).send({ err: err.message });
   }
@@ -112,5 +105,4 @@ if(id===req.userId){
       res.status(400).send({msg:err.message})
     }
   })
-  
 module.exports = { driverRouter };
