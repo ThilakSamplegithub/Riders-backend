@@ -48,22 +48,22 @@ passengerRouter.post("/login", async (req, res) => {
     console.log(user);
     if (user?.email) {
       bcrypt.compare(password, user.password, (err, result) => {
-        if (err) {
-          res.status(400).send({ msg: "Wrong Password" });
-        } else {
-          console.log(result);
-          const token = jwt.sign(
-            { userId: user._id, user: user.name },
-            "masai"
-          );
-          return res.status(200).json({ msg: `logged-in successfully`, token,id:user._id });
-        }
+         console.log(result,'is result');
+          if(result){
+            const token = jwt.sign(
+              { userId: user._id, user: user.name },
+              "masai"
+            );
+            return res.status(200).json({ msg: `logged-in successfully`, token,id:user._id });
+          }else{
+            res.status(400).send({ msg: "Wrong Password" });
+          }
       });
     }else{
-      res.status(401).send({msg:`Email doesn't exist`})
+    return  res.status(401).send({msg:`Email doesn't exist`})
     }
   } catch (err) {
-    res.status(401).send({ msg: err.message });
+  return  res.status(401).send({ msg: err.message });
   }
 });
 // This end point is to upload image

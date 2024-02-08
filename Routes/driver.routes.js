@@ -47,16 +47,14 @@ driverRouter.post("/login", async (req, res) => {
     if (driver?.email) {
       console.log(driver);
       bcrypt.compare(password, driver.password, (err, result) => {
-        if (err) {
-          res.status(200).send({ msg: "wrong password" });
-        } else {
           console.log(result);
-          const token = jwt.sign(
-            { userId: driver._id, user: driver.name,location:driver.location},
-            "masai",
-            { expiresIn: "7d" }
-          );
-          return res.status(200).json({ msg: "Logged in successfully", token,id:String(driver._id) });
+          if(result){
+            const token = jwt.sign(
+              { userId: driver._id, user: driver.name,location:driver.location},
+              "masai",
+              { expiresIn: "7d" }
+            );
+            return res.status(200).json({ msg: "Logged in successfully", token,id:String(driver._id) });
         }
       });
     } else {
