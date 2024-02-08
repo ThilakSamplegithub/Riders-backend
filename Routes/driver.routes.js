@@ -55,6 +55,8 @@ driverRouter.post("/login", async (req, res) => {
               { expiresIn: "7d" }
             );
             return res.status(200).json({ msg: "Logged in successfully", token,id:String(driver._id) });
+        }else{
+          return res.status(400).send({msg:'wrong password'})
         }
       });
     } else {
