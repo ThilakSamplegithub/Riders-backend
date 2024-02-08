@@ -49,7 +49,7 @@ passengerRouter.post("/login", async (req, res) => {
     if (user?.email) {
       bcrypt.compare(password, user.password, (err, result) => {
         if (err) {
-          res.status(200).send({ msg: "Wrong Password" });
+          res.status(400).send({ msg: "Wrong Password" });
         } else {
           console.log(result);
           const token = jwt.sign(
@@ -60,7 +60,7 @@ passengerRouter.post("/login", async (req, res) => {
         }
       });
     }else{
-      res.status(200).send({msg:`Email doesn't exist`})
+      res.status(401).send({msg:`Email doesn't exist`})
     }
   } catch (err) {
     res.status(401).send({ msg: err.message });
