@@ -60,7 +60,7 @@ driverRouter.post("/login", async (req, res) => {
         }
       });
     } else {
-      res.status(200).send({ msg: "User doesn't exist" });
+      res.status(402).send({ msg: "User doesn't exist" });
     }
   } catch (err) {
     res.status(400).send({ msg: err.message });
