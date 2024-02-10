@@ -14,12 +14,12 @@ passengerRouter.post("/register", async (req, res) => {
     const { name, email, password, gender, phoneNumber, profilePicture,location } =
       req.body;
     if (!validatePassword(password)) {
-      return res.status(200).send("Not a strong Password");
+      return res.status(400).send("Not a strong Password");
     }
     bcrypt.hash(password, 6, async (err, hashed) => {
       try {
         if (err) {
-          res.status(201).send(`please register again`);
+          res.status(401).send(`please register again`);
         } else {
           console.log(hashed);
           const passenger = await passengerModel.create({
